@@ -1,4 +1,3 @@
 requests
-re
 termcolor
 argparse
