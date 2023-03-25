@@ -1,2 +1,14 @@
 # Detector
-This is a simple python code that helps u find url's in a javascript file 
+Helps you detect Urls in Javascript files.
+
+# INSTALL 
+
+git clone https://github.com/BoutadjineAlaa/Detector.git
+
+cd Detector
+
+pip3 install -r requirements.txt
+
+# USAGE
+
+python3 Detector.py -d https://example.com/file.js
