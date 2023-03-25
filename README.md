@@ -7,7 +7,7 @@ git clone https://github.com/BoutadjineAlaa/Detector.git
 
 cd Detector
 
-pip3 install -r requirements.txt
+pip3 install -r Requirements.txt
 
 # USAGE
 
