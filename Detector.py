@@ -19,6 +19,6 @@ if response.status_code == 200:
             print(colored("\n---------------- URLs DETECTED !! ---------------\n",'green'))
             print(colored(url+"\n", 'green'))
     else:
-        print(colored('NO URLS FOUND !!', 'red'))
+        print(colored('\nNO URLS FOUND !!\n', 'red'))
 else:
-    print(colored('Error: COULD NOT FETCH !! ' + args.jsfile, 'red'))
+    print(colored('\nError: COULD NOT FETCH !! \n' + args.jsfile, 'red'))
