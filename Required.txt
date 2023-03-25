@@ -1,4 +1,0 @@
-requests
-re
-termcolor
-argparse
