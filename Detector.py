@@ -1,24 +1,58 @@
-import argparse
-import requests
 import re
-from termcolor import colored
+import requests
+import argparse
+import sys
 
-# Command Line Argument
 parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--jsfile', help='JavaScript file URL', required=True)
+parser.add_argument("-u", "--url", required=True, help="Input URL")
+parser.add_argument("-o", "--output", help="Output file location")
 args = parser.parse_args()
 
+if args.url: 
+    print("""\033[31m\n\n⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠉⣎⣧⢀⣀⡀⢀⣇⠀⠀⣐⠂⠆⠊⡱⣏⣿⡿⠋⠁⢀⣀⣤⢤⣴⡲⣖⡶⣾⣹⢯⣟⡽⣯⢿⣽⣻
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠄⣿⢿⠿⣯⣇⠀⢹⢀⡴⡠⠂⣠⢾⣹⠟⠁⠀⣀⣨⣶⣻⣼⣫⢷⣻⣭⢿⡵⣯⣟⣾⣻⣟⡿⣾⡽
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣌⢻⡏⠀⠈⠉⠓⡿⠏⠛⢰⠿⢻⢺⡿⢖⣾⠿⣟⣿⡽⣃⣉⠉⠉⢙⢓⣊⢿⡽⣛⣾⢷⣻⣽⡳⡟
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⢂⠍⡉⣹⣻⢾⣽⣏⣯⣟⣾⢯⡽⣿⢽⣫⣷⡿⠝⣓
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠃⠌⢒⠠⠱⣭⣿⣳⣟⣾⡽⣞⡯⣟⣞⣯⣷⣿⡽⣟⣉
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠜⡀⢣⠘⡠⣽⣿⣽⣫⡽⢯⣽⣏⡿⣞⣟⣮⣽⠷⠋
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⡀⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠁⡌⠄⢣⠐⡉⢿⣯⢿⣽⣻⣧⡿⣽⣿⣻⣷⠗⡂⠠
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠰⠬⠝⣖⠀⠀⠀⢠⢔⣂⡭⢅⠰⠠⢆⡙⠲⢥⣂⠅⡒⡘⣿⠟⢈⡤⡙⣿⣽⢾⡷⢁⣀⣤⣤
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢆⠀⠀⠩⠀⠀⠀⠀⠉⠒⠐⠢⠭⣭⠖⣂⡅⢂⠌⡡⢐⡐⢃⠞⡓⡗⡍⢿⡾⣯⠿⠛⠉⠉⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢰⠁⠀⠆⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⢀⠁⡆⠸⢀⠁⢆⢹⣆⡰⢹⠇⣿⡿⠷⠀⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠈⠀⠌⠀⢀⠀⠀⠀⠀⠀⠀⣸⠀⠀⠀⠅⠂⢌⠂⡅⢊⢤⣞⡄⠜⢫⡼⠋⠀⠀⠀⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⡊⠀⡠⠊⡁⢄⠀⠀⠀⠀⢻⠀⠀⢠⢈⠰⢈⠒⡈⢤⡎⢀⣤⡾⠟⣁⣀⣀⠀⠤⠠⠄⠒⣂
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠈⠪⠡⠐⠁⠀⠀⠀⠀⠛⠀⠀⡀⠂⡌⢂⡑⣨⡣⢂⣿⣿⡧⠵⠶⠖⠒⠚⠛⠋⠉⠉⠉
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠒⠂⠀⠠⠄⡀⠀⠀⠀⢀⠡⠡⡐⠂⣔⣾⠑⣺⣿⣿⡇⢰⡀⠦⠀⠀⠀⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠱⠒⢂⣀⠄⠀⠀⠀⠀⡌⠠⢁⡴⢋⢹⡁⢂⣿⣿⣿⡧⣧⣼⠧⠴⠬⠤⠤⣤⠤⠤
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡂⠀⠈⠈⠀⠀⠀⠀⡠⢊⣠⠕⢋⡐⢤⢫⢀⢃⣿⣿⣿⣟⣿⣿⣯⡔⣽⡼⡩⣥⠇⣀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢟⠋⢸⡏⢆⠀⠀⠀⠀⠠⣊⠔⡋⠄⢌⡐⢄⢎⠅⣂⣾⡿⣿⣿⣿⣿⣿⣳⡗⣾⣗⣧⢹⡆⡥
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡋⠘⢆⠈⠻⢷⣗⣶⢶⣳⢮⣥⣜⣤⣮⣔⣤⣾⣼⢿⣟⣯⣿⣟⣿⣿⣿⣿⣳⡝⣶⡽⣹⣞⡳⣵
+⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⠋⠀⢐⡇⢰⡀⢂⠉⠢⠤⢈⣉⣛⡙⢿⣺⡽⣞⡷⣯⣟⣾⡽⣿⢾⣻⢾⣽⡾⣯⡙⠻⢷⣭⣳⠟⣽⡧⣟⣽
+--------{ Coded By Boutadjine Alaa }--------------\033[0m""")
+    print("\033[31m@Boutadjine36264\033[0m")
+    try:
+        content = requests.get(args.url).text.split('"')
 
-response = requests.get(args.jsfile)
+        extensions = (".png", ".jpg", ".wav", ".jpeg", ".json", ".js", ".php", ".xml")
+        starts = ("/", "http://", "https://", "file://", "php://", "ftp://", "./", "../")
 
-if response.status_code == 200:
-    # search for URLs in the JavaScript file
-    urls = re.findall(r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', response.text)
-    if len(urls) > 0:
-        for url in urls:
-            print(colored("\n---------------- URLs DETECTED !! ---------------\n",'green'))
-            print(colored(url+"\n", 'green'))
-    else:
-        print(colored('\nNO URLS FOUND !!\n', 'red'))
-else:
-    print(colored('\nError: COULD NOT FETCH !! \n' + args.jsfile, 'red'))
+        end_point = set()
+        for i in content:
+            if re.match("^[a-zA-Z0-9_\/:&?%.\-=]*$", i):
+                if i.startswith(starts) or i.endswith(extensions):
+                    end_point.add(i)
+                elif not i.startswith(starts):
+                    temp = i.split("/")
+                    if any(j in end_point for j in ["/" + temp[0], "./" + temp[0], "../" + temp[0]]):
+                        end_point.add(i)
+
+        if args.output:
+            with open(args.output, "w") as f:
+                for url in end_point:
+                    f.write(f"{url}\n")
+        else:
+            for url in end_point:
+                sys.stdout.write("\033[32m" + url + "\n\033[0m")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
