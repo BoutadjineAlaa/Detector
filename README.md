@@ -1,5 +1,5 @@
-# Detector
-Helps you detect Urls in Javascript files.
+# JSDetector
+Helps you detect ENDPOINTS from Javascript.
 
 # INSTALL 
 
@@ -11,4 +11,6 @@ pip3 install -r Requirements.txt
 
 # USAGE
 
-python3 Detector.py -d https://example.com/file.js
+python3 JSDetector.py --url https://example.com/file.js --output result.txt
+
+#H HAPPY HACKING !!
